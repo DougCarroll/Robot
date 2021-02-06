@@ -6,14 +6,12 @@ import struct
 import threading
 import multiprocessing
 import time
-from Move import *
-from Sonic import *
+from Command import *
 
 class Radar:    
     def __init__(self):
         print("Entered Radar")
-        self.move=Move()
-        self.sonic=Sonic()
+        self.move=Command()
 
     def scan(self):
 
@@ -29,7 +27,7 @@ class Radar:
             self.move.headUpAndDown(sweep[i][0])
             #   measure distance at that degree
             #   save that value back in array associated with that degree
-            sweep.insert([i][self.sonic.getDistance()])
+            sweep.insert([i][self.move.getSonicData()])
             time.sleep(.05)
         return sweep
 
