@@ -19,50 +19,54 @@ class Radar:
         time.sleep(.75)
         # create variable name "sweep" to hold an array that looks like this:
         # (120,integer), (110, integer), (100, integer), (90, integer), (80, integer), (70, integer), (60, integer)
-        sweep = [[120,0],[110,0],[100,0],[90,0],[80,0],[70,0],[60,0]]
+        sweep = [[120,999],[110,999],[100,999],[90,999],[80,999],[70,999],[60,999]]
  
         # for 120, 110, 100, 90, 80, 70, 60
         for i in range(len(sweep)):
             #   move head to value in degrees as stored in array
-            self.move.headUpAndDown(sweep[i][0])
+            degrees = sweep[i][0]
+            self.move.headUpAndDown(degrees)
             #   measure distance at that degree
             #   save that value back in array associated with that degree
-            sweep.insert([i][self.move.getSonicData()])
+            sweep[i] = [degrees,int(self.move.getSonicData())]
             time.sleep(.05)
         return sweep
 
     def survey(self, count):
         i = 0
-        self.surveyArray = [0,0]
+        surveyArray = [['']]
         while  i < count:
             #   Take a single scan and save return variable named "surveyArray" in a new arry that looks like this:
             #       (scanCount, sweep), (scanCount+1, sweep) ... (scanCount+n, sweep)
-            self.surveyArray.append(self.scan())
+            surveyArray.insert(i,self.scan())
             i=i+1
-        return self.surveyArray
+        return surveyArray
 
     def analyze(self, surveyArray):
         surveyAverage=[0,0]
         total=[0]
         # Print out array to the screen
-        print("Full Survey\n")
-        for i in range(len(surveyArray)):
+        print("Full Survey")
+        for i in range(len(surveyArray)-1):
+            print(*surveyArray[i])
+        # Need to subtract 1 for now because I initialized list, added 2 items, and then inserted
+        for i in range(len(surveyArray)-1):
             sweep=surveyArray[i][1]
-            for j in range(len(sweep)):
-                print(sweep[j][1])
-    
+                
         # Take the average of each distance for each degree and save in variable surveyAverage
-        for i in range(len(surveyArray)):
-            sweep=surveyArray[i][1]
+        for i in range(len(surveyArray) - 1):
+            sweep=surveyArray[i]
             for j in range(len(sweep)):
-                total[i] = total[i] + sweep[j][1]
-        for i in range(len(total)):
-            surveyAverage[i] = (total[i] / len(sweep))
+                currentValue = total[i]
+                newValue = sweep[j][1]
+                addition = currentValue + newValue
+                total.insert(i, addition)
+        #for i in range(len(total)):
+            surveyAverage.insert(i, round(total[i] / (len(surveyArray)-1) ))
 
         # print surveyAverage to the screen
-        print("Average Survey\n")
-        for i in range(len(surveyAverage)):
-            print(surveyAverage[i])
+        print("Average Survey")
+        print(*surveyAverage)
 
         return surveyAverage
 
@@ -70,6 +74,7 @@ class Radar:
         # create variable named "refinedSurvey" to hold an array that looks like this:
         # (1 or 0), (1 or 0), (1 or 0), (1 or 0), (1 or 0), (1 or 0), (1 or 0)
         # for each item in array
+        refinedSurveyAverage = ''
         for i in range(len(surveyAverage)):
             #   if distance is > 30 set distance to 1
             if surveyAverage[i] > 30:
@@ -80,6 +85,11 @@ class Radar:
         return refinedSurveyAverage
 
     def maneuver(self, refinedSurveyAverage):
+        #Probably a test case, but keep walking since nothing is there
+        if refinedSurveyAverage == '0000000':
+            print("Probably not valid, but keep walking")
+            return
+        # if 1111111 then turn right 90 degrees and return
         if refinedSurveyAverage == '111111':
             print("Turn right 90 degrees")
             return

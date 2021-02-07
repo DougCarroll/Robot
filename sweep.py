@@ -21,7 +21,7 @@ class Sweep:
             #   while distance > 30 keep walking
             while move.getSonicData() > 30:
                 move.walk()
-                print("Keep Walking")
+                print("Walking...")
             #   Once distance is less that 30
             #   surveyArray = survey(5)
             surveyArray = radar.survey(5)
